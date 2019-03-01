@@ -1,0 +1,39 @@
+{
+  "A": {
+    "type": "leaf"
+  },
+  "B": {
+    "type": "leaf"
+  },
+  "main": {
+    "type": "graph",
+    "nodes": {
+      "A": "A",
+      "B": "B",
+      "Intermediate": "Intermediate"
+    },
+    "arrows": {
+      "Intermediate": {
+        "done": {
+          "target": "B",
+          "entryPoint": "start"
+        }
+      },
+      "A": {
+        "go": {
+          "target": "Intermediate",
+          "entryPoint": "start"
+        }
+      }
+    },
+    "entryPoints": {
+      "start": {
+        "target": "A",
+        "entryPoint": "start"
+      }
+    }
+  },
+  "Intermediate": {
+    "type": "leaf"
+  }
+}
