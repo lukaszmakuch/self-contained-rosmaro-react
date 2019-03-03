@@ -1,3 +1,4 @@
+import React from 'react';
 import { makeHandler } from '../../../utils.js';
 
 export default () => ({

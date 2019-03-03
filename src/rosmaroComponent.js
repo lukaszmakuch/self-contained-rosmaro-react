@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 const defaultHandlers = {
   DISPATCH: dispatch => async effect => {
@@ -6,52 +6,61 @@ const defaultHandlers = {
   }
 };
 
-export default ({ model, handlers: customHandlers }) => {
-  let state = undefined;
-  let renderableState = undefined;
+export default class extends Component {
+  constructor(props) {
+    super(props);
+    this.rosmaroState = undefined;
+    this.recentRenderableState = undefined;
+    this.renderAction = undefined;
+    this.handlers = { ...defaultHandlers, ...props.customHandlers };
 
-  let update = () => { };
-  const dispatch = action => {
-    const { state: newState, result: { effect } } = model({ state, action });
-    state = newState;
-    dispatchEffect(effect);
-    update();
+    this.dispatch = action => {
+      const { state: newState, result: { effect } } = props.model({ state: this.rosmaroState, action });
+      this.rosmaroState = newState;
+      this.dispatchEffect(effect);
+      this.forceUpdate();
+    }
+
+    this.renderAction = {
+      type: 'RENDER',
+      dispatch: this.dispatch
+    }
   }
 
-  const handlers = { ...defaultHandlers, ...customHandlers };
-
-  const interpretEffect = effect => {
-    const handler = handlers[effect.type];
-    if (handler) handler(dispatch)(effect);
+  static defaultProps = {
+    customHandler: []
   }
 
-  const dispatchEffect = effect => {
+  componentDidMount() {
+    if (this.props.init) {
+      this.dispatch(this.props.init);
+    }
+  }
+
+  render() {
+    const {state: renderableState, result: {data: rendered}} = this.props.model({
+      state: this.rosmaroState,
+      action: this.renderAction
+    });
+    if (rendered) {
+      this.recentRenderableState = renderableState;
+      return rendered;
+    } else if (this.recentRenderableState) {
+      return this.props.model({ state: this.recentRenderableState, action: this.renderAction }).result.data;
+    } else {
+      return null;
+    }
+  }
+
+  dispatchEffect(effect) {
     if (!effect) return;
-    if (Array.isArray(effect)) effect.flat().forEach(interpretEffect);
-    interpretEffect(effect);
+    if (Array.isArray(effect)) effect.flat().forEach(this.interpretEffect);
+    this.interpretEffect(effect);
   }
 
-  const renderAction = {
-    type: 'RENDER',
-    dispatch
-  };
-
-  const rosmaroComponent = class extends Component {
-    componentDidMount() {
-      update = this.forceUpdate.bind(this);
-    }
-    render() {
-      const { state: renderedState, result: { data: rendered } } = model({ state, action: renderAction });
-      if (rendered) {
-        renderableState = renderedState;
-        return rendered;
-      } else if (renderableState) {
-        return model({ state: renderableState, action: renderAction }).result.data;
-      } else {
-        return null;
-      }
-    }
+  interpretEffect = (effect) => {
+    const handler = this.handlers[effect.type];
+    if (handler) handler(this.dispatch)(effect);
   }
 
-  return rosmaroComponent;
 }
