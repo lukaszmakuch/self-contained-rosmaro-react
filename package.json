@@ -7,7 +7,7 @@
     "react-dom": "^16.8.3",
     "react-scripts": "2.1.5",
     "rosmaro": "^0.8.4",
-    "rosmaro-binding-utils": "0.0.9"
+    "rosmaro-binding-utils": "0.0.13"
   },
   "scripts": {
     "start": "react-scripts start",

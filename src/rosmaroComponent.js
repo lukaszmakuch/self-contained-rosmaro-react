@@ -6,8 +6,6 @@ const defaultHandlers = {
   }
 };
 
-const execAction = { type: 'EXEC' };
-
 export default ({ model, handlers: customHandlers }) => {
   let state = undefined;
   let renderableState = undefined;
@@ -17,7 +15,6 @@ export default ({ model, handlers: customHandlers }) => {
     const { state: newState, result: { effect } } = model({ state, action });
     state = newState;
     dispatchEffect(effect);
-    tryToExec();
     update();
   }
 
@@ -34,11 +31,6 @@ export default ({ model, handlers: customHandlers }) => {
     interpretEffect(effect);
   }
 
-  const tryToExec = () => {
-    const { state: newState, result: { effect } } = model({ state, action: execAction });
-    dispatchEffect(effect);
-  }
-
   const renderAction = {
     type: 'RENDER',
     dispatch
@@ -47,7 +39,6 @@ export default ({ model, handlers: customHandlers }) => {
   const rosmaroComponent = class extends Component {
     componentDidMount() {
       update = this.forceUpdate.bind(this);
-      tryToExec();
     }
     render() {
       const { state: renderedState, result: { data: rendered } } = model({ state, action: renderAction });

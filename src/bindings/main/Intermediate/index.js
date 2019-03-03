@@ -5,7 +5,7 @@ export default () => ({
 
     DONE: () => ({arrow: 'done'}),
 
-    EXEC: () => {
+    ON_ENTRY: () => {
       return {
         effect: {
           type: 'DISPATCH',
